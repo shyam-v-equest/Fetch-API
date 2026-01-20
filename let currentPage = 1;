@@ -1,0 +1,51 @@
+let currentPage = 1;
+let isLoading = false;
+
+async function getData(isScroll = false) {
+  const limit = document.getElementById("limit").value;
+
+  if (!limit) {
+    alert("Please enter limit");
+    return;
+  }
+
+  if (isLoading) return;
+  isLoading = true;
+
+  try {
+    const url = `https://jsonplaceholder.typicode.com/posts?_page=${currentPage}&_limit=${limit}`;
+    const response = await fetch(url);
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
+    const result = await response.json();
+
+    const tableBody = document.getElementById("json-data");
+
+    // Clear table only for first load (button click)
+    if (!isScroll) {
+      tableBody.innerHTML = "";
+      currentPage = 1;
+    }
+
+    result.forEach(item => {
+      const row = `
+        <tr>
+          <td>${item.userId}</td>
+          <td>${item.id}</td>
+          <td>${item.title}</td>
+          <td>${item.body}</td>
+        </tr>
+      `;
+      tableBody.insertAdjacentHTML("beforeend", row);
+    });
+
+    currentPage++;
+  } catch (error) {
+    console.error("Error fetching data:", error);
+  } finally {
+    isLoading = false;
+  }
+}

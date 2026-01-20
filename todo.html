@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Todo List with Status</title>
+  <style>
+    li { margin-bottom: 15px; list-style: none; border-bottom: 1px solid #ccc; padding-bottom: 10px; }
+    .status-label { font-weight: bold; margin-right: 5px; }
+  </style>
+</head>
+<body>
+
+  <h2>Todo List</h2>
+
+  <input type="text" id="todoInput" placeholder="Enter a task">
+  <br><br>
+  <textarea id="description" placeholder="Describe" rows="3" cols="30"></textarea>
+  <br>
+  <button onclick="addTodo()">Add Task</button>
+
+  <ul id="todoList"></ul>
+
+  <script>
+    let todos = [];
+
+    function addTodo() {
+      const input = document.getElementById("todoInput");
+      const desc = document.getElementById("description");
+      
+      if (input.value.trim() === "" || desc.value.trim() === "") {
+        alert("Please enter both a task and a description");
+        return;
+      }
+
+      let newObj = {
+        title: input.value.trim(),
+        details: desc.value.trim(),
+        status: "Pending" 
+      };
+
+      todos.push(newObj);
+      input.value = "";
+      desc.value = "";
+      renderTodos();
+    }
+
+    function updateStatus(index, newStatus) {
+      todos[index].status = newStatus;
+      console.log("Updated Todo:", todos[index]);
+    }
+
+    function deleteTodo(index) {
+      todos.splice(index, 1);
+      renderTodos();
+    }
+
+    function renderTodos() {
+      const list = document.getElementById("todoList");
+      list.innerHTML = "";
+
+      todos.forEach((todo, index) => {
+        const li = document.createElement("li");
+
+        li.innerHTML = `
+          <strong>${todo.title}</strong><br>
+          <small>${todo.details}</small><br>
+          <span class="status-label">Status:</span>
+        `;
+
+        const select = document.createElement("select");
+        const options = ["Pending", "In Progress", "Completed"];
+        
+        options.forEach(opt => {
+          const option = document.createElement("option");
+          option.value = opt;
+          option.textContent = opt;
+          if (todo.status === opt) option.selected = true;
+          select.appendChild(option);
+        });
+
+        select.onchange = (e) => updateStatus(index, e.target.value);
+
+        const deleteBtn = document.createElement("button");
+        deleteBtn.textContent = "Delete";
+        deleteBtn.style.marginLeft = "10px";
+        deleteBtn.onclick = () => deleteTodo(index);
+
+        li.appendChild(select);
+        li.appendChild(deleteBtn);
+        list.appendChild(li);
+      });
+    }
+  </script>
+
+</body>
+</html>
